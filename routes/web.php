@@ -19,4 +19,9 @@ Route::get('/', function () {
 });
 
 Route::get('produk', [ProdukController::class, 'index'])->name('produk.index');
+Route::get('produk/add', [ProdukController::class, 'view'])->name('produk.view');
+Route::post('produk/store', [ProdukController::class, 'store'])->name('produk.store');
+Route::get('produk/{id}/edit', [ProdukController::class, 'edit'])->name('produk.edit');
+Route::put('produk/{id}', [ProdukController::class, 'update'])->name('produk.update');
+Route::delete('produk/{id}', [ProdukController::class, 'destroy'])->name('produk.delete');
 Route::get('api-fetch', [ProdukController::class, 'fetchAndSaveData'])->name('api.fetch');

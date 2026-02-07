@@ -63,7 +63,71 @@ class ProdukController extends Controller
     }
     public function index()
     {
-        $produk = Produk::with(['kategori', 'status'])->get();
+        $produk = Produk::with(['kategori', 'status'])->whereHas('status', function ($query) {
+            $query->where('nama_status', 'bisa dijual');
+        })->get();
         return view('produk', compact('produk'));
+    }
+
+    public function view()
+    {
+        $kategori =    Kategori::all();
+        $status =    Status::all();
+        return view('store', compact('kategori', 'status'));
+    }
+    public function store(Request $request)
+    {
+        $request->validate([
+            'nama_produk' => 'required',
+            'harga' => 'required|numeric',
+            'kategori' => 'required|exists:kategori,id_kategori',
+            'status' => 'required|exists:status,id_status',
+        ]);
+
+        $data = [
+            'nama_produk' => $request->nama_produk,
+            'harga' => $request->harga,
+            'id_kategori' => $request->kategori,
+            'id_status' => $request->status,
+        ];
+
+        Produk::create($data);
+        return redirect()->route('produk.index')->with('success', 'Berhasil menambah barang');
+    }
+
+    public function edit($id)
+    {
+        $produk = Produk::findOrFail($id);
+        $kategori = Kategori::all();
+        $status = Status::all();
+        return view('edit', compact('produk', 'kategori', 'status'));
+    }
+
+    public function update(Request $request, string $id)
+    {
+        $produk = Produk::findOrFail($id);
+        $request->validate([
+            'nama_produk' => 'required',
+            'harga' => 'required|number',
+            'kategori' => 'required|exists:kategori,id_kategori',
+            'status' => 'required|exists:status,id_status',
+
+        ]);
+
+        $data  = [
+            'nama_produk' => $request->nama_produk,
+            'harga' => $request->harga,
+            'id_kategori' => $request->kategori,
+            'id_status' => $request->status,
+        ];
+
+        $produk->update($data);
+        return redirect()->route('produk.index')->with('success', 'Berhasil Update Produk');
+    }
+    public function destroy(string $id)
+    {
+        $produk = Produk::findOrFail($id);
+        $produk->delete();
+        return redirect()->route('produk.index')->with('success', 'Berhasil Update Produk');
     }
 }
